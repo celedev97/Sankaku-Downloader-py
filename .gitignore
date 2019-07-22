@@ -102,3 +102,11 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+#vscode
+.vscode
+
+#pynstaller
+build.bat
+icon.jpg
+main.spec
