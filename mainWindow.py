@@ -3,9 +3,18 @@ from tkinter import *
 
 import threading
 import os
+import sys
 
 from Sankaku import Sankaku
 import Settings
+
+def resource_path(relative_path):    
+    if(hasattr(sys, "_MEIPASS")):
+        base_path = getattr(sys, "_MEIPASS")
+    else:
+        base_path = os.path.abspath(".")
+    print(os.path.join(base_path, relative_path))
+    return os.path.join(base_path, relative_path)
 
 class MainWindow(Tk):
     #string vars
@@ -24,7 +33,16 @@ class MainWindow(Tk):
         self.geometry('350x200')
         self.update()
         self.minsize(self.winfo_width(), self.winfo_height())
-        self.iconbitmap(default="icon.ico")
+
+        #region icon
+        datafile = "resources\\icon.ico"
+        if not hasattr(sys, "frozen"):
+            datafile = os.path.join(os.path.dirname(__file__), datafile)
+        else:
+            datafile = os.path.join(sys.prefix, datafile)
+        #endregion
+
+        self.iconbitmap(default=resource_path(datafile))
 
         #region Panel Input
         gridpadding = 2
