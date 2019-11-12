@@ -1,38 +1,29 @@
-import urllib.request
+import requests
 import mimetypes
 import json
 import Settings
 
 class Sankaku:
+    __session = requests.Session()
+
     progress = 0
     total = 0
     statusMessage = "idle"
 
     posts = []
 
-    
-
     #region Static
-    #region Helpers
     @staticmethod
-    def __getUrlJsonToObject(url):
-        req = urllib.request.Request(
-            url, 
-            data=None, 
-            headers= Settings.HTTP_HEADERS
-        )
-        return json.loads(urllib.request.urlopen(req).read().decode('utf-8'))
-
-    @staticmethod
-    def __tagFormat(tags):
-        return tags.replace(' ','+')
-
-    @staticmethod
-    def __getFileType(url):
+    def __getFileType(url): 
         lastQuestionMark = url.rfind('?')
         lastDotBeforeQM = url.rfind('.',0,lastQuestionMark)
-        #remove everything before first?get
+        #remove everything before .:?
         return url[lastDotBeforeQM:lastQuestionMark]
+
+    @staticmethod
+    def download_post(post, folder):
+        r = Sankaku.__session.get(post[Settings.POST_URL])
+        open(folder+"\\"+str(post[Settings.POST_ID]) + Sankaku.__getFileType(post[Settings.POST_URL]), 'wb').write(r.content)
     #endregion
 
     def get_posts(self, page = 0):
@@ -46,22 +37,14 @@ class Sankaku:
                 self.posts.extend(temp)
         else:
             print("G("+self.tags+"):"+str(page))
-            return Sankaku.__getUrlJsonToObject(Settings.API_URL + 'posts?lang=english&page='+str(page)+'&limit=100&tags='+Sankaku.__tagFormat(self.tags))
+            params = {
+                'lang':'english',
+                'page':page,
+                'limit':100,
+                'tags':self.tags
+            }
+            return json.loads(Sankaku.__session.get(Settings.API_URL + 'posts',params = params).content)
         return self.posts
-
-    @staticmethod
-    def download_post(post, folder):
-        req = urllib.request.Request(
-            post[Settings.POST_URL], 
-            data=None, 
-            headers= Settings.HTTP_HEADERS
-        )
-        filename = folder+"\\"+str(post[Settings.POST_ID]) + Sankaku.__getFileType(post[Settings.POST_URL])
-        datatowrite = urllib.request.urlopen(req).read()
-        with open(filename, 'wb') as f:
-            f.write(datatowrite)
-            f.close()
-    #endregion
 
     def __init__(self,tags,folder,print = None):
         self.tags = tags
@@ -78,5 +61,5 @@ class Sankaku:
         for i in range(self.total):
             self.output("D("+str(i+1)+"/"+str(self.total)+"):"+ str(posts[i][Settings.POST_ID]))
             Sankaku.download_post(posts[i],self.folder)
-            self.progress += 1;
+            self.progress += 1
         self.output("Complete")
