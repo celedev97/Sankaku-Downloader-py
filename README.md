@@ -2,24 +2,27 @@
 
 A downloader for SankakuComplex images written in python.
 
-## Getting Started
+## Running the program
 
 To use the program simply download the [latest release](https://github.com/fc-dev/Sankaku-Downloader/releases/latest) for your operating system and run it.
 
 ### Prerequisites
 
-Depending on your operating system you may need python (3.7.4) installed.
+To run the program directly from source you need python (3.7.4) installed, but if you download a release it's already bundled with python so you don't need to download it.
 
-For now the only release is for windows and it's already bundled with python so you don't need to download it.
+## Building
 
-### Installing
+If you want to make bundle the program with pyinstaller after making some modifications simply run this command from a terminal.
 
-The program is a standalone and doesn't require installation.
-
+```
+pyinstaller --onefile main.spec
+```
 
 ## Contributing
 
 If you want to help with this project contact me or do a pull request.
+
+
 
 ## Authors
 
