@@ -55,6 +55,7 @@ class Sankaku:
         if(callable(self.print)): self.print(string)
 
     def download(self):
+        Sankaku.__session.headers['User-Agent'] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36 Edg/84.0.522.40"
         self.progress = 0
         posts = self.get_posts()
         self.total = len(posts)
