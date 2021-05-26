@@ -1,7 +1,15 @@
 import requests
 import mimetypes
 import json
-import Settings
+
+# region Sankaku stuff
+API_URL = "https://capi-v2.sankakucomplex.com/"
+HTTP_HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36'}
+
+POST_ID = "id"
+POST_URL = "file_url"
+POST_MIME = "file_type"
+# endregion
 
 class Sankaku:
     __session = requests.Session()
@@ -22,10 +30,10 @@ class Sankaku:
 
     @staticmethod
     def download_post(post, folder):
-        if(post[Settings.POST_URL] == None):
+        if(post[POST_URL] == None):
             print(f"Can't download: {post}")
-        r = Sankaku.__session.get(post[Settings.POST_URL])
-        open(folder+"\\"+str(post[Settings.POST_ID]) + Sankaku.__getFileType(post[Settings.POST_URL]), 'wb').write(r.content)
+        r = Sankaku.__session.get(post[POST_URL])
+        open(folder+"\\"+str(post[POST_ID]) + Sankaku.__getFileType(post[POST_URL]), 'wb').write(r.content)
     #endregion
 
     def get_posts(self):
@@ -47,7 +55,7 @@ class Sankaku:
         }
         if (page != None):
             params['next'] = page
-        return json.loads(Sankaku.__session.get(Settings.API_URL + 'posts/keyset', params = params).content)
+        return json.loads(Sankaku.__session.get(API_URL + 'posts/keyset', params = params).content)
 
 
     def __init__(self,tags,folder,print = None):
@@ -59,12 +67,12 @@ class Sankaku:
         if(callable(self.print)): self.print(string)
 
     def download(self):
-        Sankaku.__session.headers['User-Agent'] = Settings.HTTP_HEADERS['User-Agent']
+        Sankaku.__session.headers['User-Agent'] = HTTP_HEADERS['User-Agent']
         self.progress = 0
         posts = self.get_posts()
         self.total = len(posts)
         for i in range(self.total):
-            self.output("D("+str(i+1)+"/"+str(self.total)+"):"+ str(posts[i][Settings.POST_ID]))
+            self.output("D("+str(i+1)+"/"+str(self.total)+"):"+ str(posts[i][POST_ID]))
             Sankaku.download_post(posts[i],self.folder)
             self.progress += 1
         self.output("Complete")
