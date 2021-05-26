@@ -94,3 +94,6 @@ class MainWindow(Tk):
     def output(self, string):
         self.logTextArea.insert(END, string+"\r\n")
         self.logTextArea.see(END)
+
+if __name__ == '__main__':
+    MainWindow()
