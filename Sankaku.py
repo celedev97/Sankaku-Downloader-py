@@ -22,29 +22,33 @@ class Sankaku:
 
     @staticmethod
     def download_post(post, folder):
+        if(post[Settings.POST_URL] == None):
+            print(f"Can't download: {post}")
         r = Sankaku.__session.get(post[Settings.POST_URL])
         open(folder+"\\"+str(post[Settings.POST_ID]) + Sankaku.__getFileType(post[Settings.POST_URL]), 'wb').write(r.content)
     #endregion
 
-    def get_posts(self, page = 0):
-        if(page == 0):
-            #page is not specified, so i get them all
-            self.posts = []
-            temp = [0]
-            while(len(temp) != 0):
-                page+=1
-                temp = self.get_posts(page)
-                self.posts.extend(temp)
-        else:
-            print("G("+self.tags+"):"+str(page))
-            params = {
-                'lang':'english',
-                'page':page,
-                'limit':100,
-                'tags':self.tags
-            }
-            return json.loads(Sankaku.__session.get(Settings.API_URL + 'posts',params = params).content)
+    def get_posts(self):
+        page = ""
+        self.posts = []
+        temp = [0]
+        while(page != None):
+            temp = self._getPage(page)
+            page = temp['meta']['next']
+            self.posts.extend(temp['data'])
         return self.posts
+
+    def _getPage(self, page = None):
+        print("G("+self.tags+"):"+str(page))
+        params = {
+            'lang':'en',
+            'limit':40,
+            'tags':self.tags
+        }
+        if (page != None):
+            params['next'] = page
+        return json.loads(Sankaku.__session.get(Settings.API_URL + 'posts/keyset', params = params).content)
+
 
     def __init__(self,tags,folder,print = None):
         self.tags = tags
@@ -55,7 +59,7 @@ class Sankaku:
         if(callable(self.print)): self.print(string)
 
     def download(self):
-        Sankaku.__session.headers['User-Agent'] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36 Edg/84.0.522.40"
+        Sankaku.__session.headers['User-Agent'] = Settings.HTTP_HEADERS['User-Agent']
         self.progress = 0
         posts = self.get_posts()
         self.total = len(posts)
