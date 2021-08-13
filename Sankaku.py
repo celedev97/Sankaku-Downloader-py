@@ -70,21 +70,6 @@ class Sankaku:
 
         return [res[0]]
 
-
-    @staticmethod
-    def download_post_from_id(id: int, folder: str):
-        posts = Sankaku.get_info_from_id(id)
-
-        if not posts:
-            return print('Nothing found with that id, returning...')
-
-        # loop on the thing then download
-        for post in posts:
-            Sankaku.download_post(post, folder)
-
-        print("Done!")
-
-
     def get_posts(self):
         page = ""
         self.posts = []
