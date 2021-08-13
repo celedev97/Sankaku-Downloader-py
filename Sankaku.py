@@ -1,4 +1,3 @@
-from os import stat
 import requests
 import mimetypes
 import json
