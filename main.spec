@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['C:\\Users\\fcdev\\repos\\Sankaku-Downloader'],
+             pathex=['D:\\Projects\\Contributing\\Sankaku-Downloader'],
              binaries=[],
              datas=[('resources/icon.ico','resources')],
              hiddenimports=[],
@@ -15,6 +15,7 @@ a = Analysis(['main.py'],
              win_private_assemblies=False,
              cipher=block_cipher,
              noarchive=False)
+			 
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 exe = EXE(pyz,
