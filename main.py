@@ -13,6 +13,7 @@ def resource_path(relative_path):
         base_path = getattr(sys, "_MEIPASS")
     else:
         base_path = os.path.abspath(".")
+        
     return os.path.join(base_path, relative_path)
 
 class MainWindow(Tk):
@@ -21,6 +22,7 @@ class MainWindow(Tk):
 
     #region Controls
     queryEntry = None
+    idEntry = None
     browseButton = None
     downloadButton = None
     logTextArea = None
@@ -56,23 +58,30 @@ class MainWindow(Tk):
         self.queryEntry = Entry(parent)
         self.queryEntry.grid(row=0,column=1,sticky='we',padx=gridpadding, columnspan=2)
         #endregion
+
+        # fucking uhhh custom id thingy
+        temp = Label(parent, text='ID:')
+        temp.grid(row=1, column=0, sticky='w', padx=gridpadding)
+
+        self.idEntry = Entry(parent)
+        self.idEntry.grid(row=1, column=1, sticky='we', padx=gridpadding, columnspan=2)
         
         #region Download Folder
         temp = Label(parent,text="Download Folder:")
-        temp.grid(row=1,column=0,sticky="w",padx=gridpadding)
+        temp.grid(row=2,column=0,sticky="w",padx=gridpadding)
 
-        self.downloadFolderString = StringVar(self);
+        self.downloadFolderString = StringVar(self, value='downloads')
         self.downloadFolderEntry = Entry(parent, textvariable=self.downloadFolderString)
-        self.downloadFolderEntry.grid(row=1,column=1,sticky='we',padx=gridpadding)
+        self.downloadFolderEntry.grid(row=2,column=1,sticky='we',padx=gridpadding)
 
         self.browseButton = Button(parent, text="Select",command = self.browseButton_Click)
-        self.browseButton.grid(row=1,column=2,sticky='e',padx=gridpadding)
+        self.browseButton.grid(row=2,column=2,sticky='e',padx=gridpadding)
         #endregion
 
         #region Download Button
         self.downloadButton = Button(parent)
         self.downloadButton.configure(text="Download",command = self.downloadButton_Click)
-        self.downloadButton.grid(row=2, column = 0,sticky="w",padx=gridpadding)
+        self.downloadButton.grid(row=3, column = 0,sticky="w",padx=gridpadding)
         #endregion
         #endregion
         
@@ -83,7 +92,11 @@ class MainWindow(Tk):
         self.mainloop()
     
     def downloadButton_Click(self):
-        task = Sankaku(self.queryEntry.get(), self.downloadFolderEntry.get(), self.output)
+        # check if the path exists
+        if not os.path.exists(self.downloadFolderEntry.get()):
+            os.mkdir(self.downloadFolderEntry.get())
+
+        task = Sankaku(self.queryEntry.get(), self.downloadFolderEntry.get(), self.idEntry.get(), self.output)
         threading.Thread(target = task.download).start()
 
     def browseButton_Click(self):
