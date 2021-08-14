@@ -110,6 +110,10 @@ class Sankaku:
             self.progress = 0
             posts = self.get_posts()
 
+        # GOT DAMN
+        if len(posts) == 0:
+            return self.output('No Posts/Image found, returning.')
+
         self.total = len(posts)
         for i in range(self.total):
             self.output("D("+ str(i+1) +"/" +str(self.total) +"):" + str(posts[i][POST_ID]))
