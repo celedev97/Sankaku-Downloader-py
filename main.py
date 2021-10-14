@@ -1,5 +1,6 @@
 import tkinter, tkinter.filedialog
 from tkinter import *
+from tkinter import PhotoImage
 
 import threading
 import os
@@ -34,14 +35,15 @@ class MainWindow(Tk):
         self.minsize(self.winfo_width(), self.winfo_height())
 
         #region icon
-        datafile = "resources\\icon.ico"
+        datafile = os.path.join("resources", "icon." + ("ico" if os.name == "Windows" else "png"))
         if not hasattr(sys, "frozen"):
             datafile = os.path.join(os.path.dirname(__file__), datafile)
         else:
             datafile = os.path.join(sys.prefix, datafile)
         #endregion
 
-        self.iconbitmap(default=resource_path(datafile))
+        img = PhotoImage(file=resource_path(datafile))
+        self.tk.call('wm', 'iconphoto', self._w, img)
 
         #region Panel Input
         gridpadding = 2
