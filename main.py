@@ -94,7 +94,7 @@ class MainWindow(Tk):
             self.downloadFolderString.set(directory)      
 
     def output(self, string):
-        self.logTextArea.insert(END, string+"\r\n")
+        self.logTextArea.insert(END, string + os.linesep)
         self.logTextArea.see(END)
 
 if __name__ == '__main__':
