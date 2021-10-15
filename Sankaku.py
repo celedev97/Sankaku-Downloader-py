@@ -1,6 +1,7 @@
 import requests
 import mimetypes
 import json
+import os
 
 # region Sankaku stuff
 API_URL = "https://capi-v2.sankakucomplex.com/"
@@ -33,21 +34,26 @@ class Sankaku:
         if(post[POST_URL] == None):
             print(f"Can't download: {post}")
         r = Sankaku.__session.get(post[POST_URL])
-        open(folder+"\\"+str(post[POST_ID]) + Sankaku.__getFileType(post[POST_URL]), 'wb').write(r.content)
+        open(
+            os.path.join(folder, str(post[POST_ID])) + Sankaku.__getFileType(post[POST_URL]), 'wb'
+        ).write(r.content)
     #endregion
 
     def get_posts(self):
         page = ""
         self.posts = []
         temp = [0]
+        self.output("Downloading pages with posts")
         while(page != None):
             temp = self._getPage(page)
             page = temp['meta']['next']
             self.posts.extend(temp['data'])
+        self.output("Pages processed. " + str(len(self.posts)) + " posts found.")
         return self.posts
 
     def _getPage(self, page = None):
         print("G("+self.tags+"):"+str(page))
+        self.output("Getting the page:" + str(page))
         params = {
             'lang':'en',
             'limit':40,
@@ -73,6 +79,9 @@ class Sankaku:
         self.total = len(posts)
         for i in range(self.total):
             self.output("D("+str(i+1)+"/"+str(self.total)+"):"+ str(posts[i][POST_ID]))
-            Sankaku.download_post(posts[i],self.folder)
+            try:
+                Sankaku.download_post(posts[i],self.folder)
+            except BaseException as err:
+                self.output("There was some problem here: " + f"Unexpected {err=}")
             self.progress += 1
         self.output("Complete")

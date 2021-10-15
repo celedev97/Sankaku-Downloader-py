@@ -64,6 +64,7 @@ class MainWindow(Tk):
         temp.grid(row=1,column=0,sticky="w",padx=gridpadding)
 
         self.downloadFolderString = StringVar(self);
+        self.downloadFolderString.set(os.path.dirname(os.path.realpath(__file__)))
         self.downloadFolderEntry = Entry(parent, textvariable=self.downloadFolderString)
         self.downloadFolderEntry.grid(row=1,column=1,sticky='we',padx=gridpadding)
 
