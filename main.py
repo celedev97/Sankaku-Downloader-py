@@ -87,7 +87,7 @@ class MainWindow(Tk):
     
     def downloadButton_Click(self):
         task = Sankaku(self.queryEntry.get(), self.downloadFolderEntry.get(), self.output)
-        threading.Thread(target = task.download).start()
+        threading.Thread(target = task.downloadPageByPage).start()
 
     def browseButton_Click(self):
         directory = tkinter.filedialog.askdirectory(parent=self,title="Choose Download Folder")

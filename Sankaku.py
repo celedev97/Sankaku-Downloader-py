@@ -74,18 +74,34 @@ class Sankaku:
     def output(self, string):
         if(callable(self.print)): self.print(string)
 
-    def download(self):
+    def downloadPageByPage(self):
         Sankaku.__session.headers['User-Agent'] = HTTP_HEADERS['User-Agent']
-        self.progress = 0
-        posts = self.get_posts()
-        self.total = len(posts)
-        for i in range(self.total):
-            self.output("D("+str(i+1)+"/"+str(self.total)+"):"+ str(posts[i][POST_ID]))
-            try:
-                Sankaku.download_post(posts[i],self.folder)
-                self.output("Sleeping for: " + str(Settings.delayBetweenFetches))
-                time.sleep(Settings.delayBetweenFetches)
-            except BaseException as err:
-                self.output("There was some problem here: " + f"Unexpected {err=}")
-            self.progress += 1
+
+        self.output("Getting the total post count...")
+        self.totalPosts = len(self.get_posts())
+
+        page = ""
+        temp = [0]
+        post_counter = 0
+        while(page != None):
+            temp = self._getPage(page)
+            page = temp['meta']['next']
+            current_page_posts = temp['data']
+
+            for post in current_page_posts:
+                post_counter += 1
+                self.output("D("+str(post_counter)+"/"+str(self.totalPosts)+"):"+ str(post[POST_ID]))
+
+                if (post[POST_URL] == None):
+                    self.output("Skipping this post, because there is no URL")
+                    continue
+
+                try:
+                    Sankaku.download_post(post,self.folder)
+                    self.output("Sleeping for: " + str(Settings.delayBetweenFetches))
+                    time.sleep(Settings.delayBetweenFetches)
+                except BaseException as err:
+                    self.output("There was some problem here: " + f"Unexpected {err=}")
+                    self.output(f"Problem post data: {post=}")
+
         self.output("Complete")
