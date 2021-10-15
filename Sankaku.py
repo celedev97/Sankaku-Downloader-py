@@ -3,6 +3,7 @@ import mimetypes
 import json
 import os
 import time
+import os.path
 import Settings
 
 # region Sankaku stuff
@@ -37,9 +38,18 @@ class Sankaku:
             print(f"Can't download: {post}")
         r = Sankaku.__session.get(post[POST_URL])
         open(
-            os.path.join(folder, str(post[POST_ID])) + Sankaku.__getFileType(post[POST_URL]), 'wb'
+            Sankaku.getPostSaveFilename(post, folder),
+            'wb'
         ).write(r.content)
+
+    @staticmethod
+    def getPostSaveFilename(post, folder):
+        return os.path.join(
+            folder,
+            str(post[POST_ID])) \
+            + Sankaku.__getFileType(post[POST_URL])
     #endregion
+
 
     def get_posts(self):
         page = ""
@@ -77,8 +87,11 @@ class Sankaku:
     def downloadPageByPage(self):
         Sankaku.__session.headers['User-Agent'] = HTTP_HEADERS['User-Agent']
 
-        self.output("Getting the total post count...")
-        self.totalPosts = len(self.get_posts())
+        self.totalPosts = 1
+        if Settings.checkPostsCount:
+            self.output("Getting the total post count. It may take some time...")
+            self.totalPosts = len(self.get_posts())
+            self.output(f"Total posts found: {self.totalPosts}")
 
         page = ""
         temp = [0]
@@ -94,6 +107,11 @@ class Sankaku:
 
                 if (post[POST_URL] == None):
                     self.output("Skipping this post, because there is no URL")
+                    continue
+
+                if (Settings.checkPostExistBeforeDownload and
+                    os.path.isfile(Sankaku.getPostSaveFilename(post, self.folder))):
+                    self.output("Skipping this post, already downloaded")
                     continue
 
                 try:
