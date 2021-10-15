@@ -2,6 +2,8 @@ import requests
 import mimetypes
 import json
 import os
+import time
+import Settings
 
 # region Sankaku stuff
 API_URL = "https://capi-v2.sankakucomplex.com/"
@@ -81,6 +83,8 @@ class Sankaku:
             self.output("D("+str(i+1)+"/"+str(self.total)+"):"+ str(posts[i][POST_ID]))
             try:
                 Sankaku.download_post(posts[i],self.folder)
+                self.output("Sleeping for: " + str(Settings.delayBetweenFetches))
+                time.sleep(Settings.delayBetweenFetches)
             except BaseException as err:
                 self.output("There was some problem here: " + f"Unexpected {err=}")
             self.progress += 1
